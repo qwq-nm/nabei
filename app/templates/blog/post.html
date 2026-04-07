@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}{{ post.title }}{% endblock %}
+{% block head %}
+    <style>
+        /* 评论表单样式优化 */
+        .comment-form .form-control {
+            background-color: #1a1a1a !important;
+            border: 1px solid #555 !important;
+            color: #ffffff !important;
+            font-size: 1rem;
+        }
+        .comment-form .form-control:focus {
+            background-color: #1a1a1a !important;
+            border-color: #6c63ff !important;
+            color: #ffffff !important;
+            box-shadow: 0 0 0 0.2rem rgba(108, 99, 255, 0.25);
+        }
+        .comment-form .form-label {
+            color: #ffffff !important;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .comment-form textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+        /* 阅读时间和发表评论文字颜色 */
+        .reading-time, .post-meta {
+            color: #e0e0e0 !important;
+        }
+        .card-text {
+            color: #e0e0e0 !important;
+        }
+        h2.card-title, h3.mt-4 {
+            color: #ffffff !important;
+        }
+        /* 文章内容中的阅读时间文字 */
+        .card-text p {
+            color: #e0e0e0 !important;
+        }
+        .card-text strong {
+            color: #ffffff !important;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <h1 class="card-title">{{ post.title }}</h1>
+            <p class="card-text">发布时间: {{ post.date_posted.strftime('%Y-%m-%d %H:%M') }}</p>
+            <div class="card-text">
+                {{ post.content|safe }}
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2 class="card-title">评论</h2>
+            {% if post.comments %}
+                {% for comment in post.comments %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <p class="card-text"><strong>{{ comment.author_name }}</strong> 评论于 {{ comment.date_posted.strftime('%Y-%m-%d %H:%M') }}</p>
+                            <p class="card-text">{{ comment.content }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="card-text">还没有评论，快来发表第一条评论吧！</p>
+            {% endif %}
+
+            <h3 class="mt-4">发表评论</h3>
+            <form method="POST" action="" class="comment-form">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    {{ form.author_name.label(class="form-label") }}
+                    {% if form.author_name.errors %}
+                        {{ form.author_name(class="form-control is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.author_name.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.author_name(class="form-control") }}
+                    {% endif %}
+                </div>
+                <div class="form-group mt-3">
+                    {{ form.content.label(class="form-label") }}
+                    {% if form.content.errors %}
+                        {{ form.content(class="form-control is-invalid", rows=4) }}
+                        <div class="invalid-feedback">
+                            {% for error in form.content.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.content(class="form-control", rows=4) }}
+                    {% endif %}
+                </div>
+                <div class="form-group mt-3">
+                    {{ form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

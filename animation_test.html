@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>动画效果测试</title>
+    <style>
+        :root {
+            --primary-color: #aaa3ff;
+            --secondary-color: #7a72bb;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #232323;
+            color: #b0b0b0;
+        }
+        
+        .hero-section {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background: linear-gradient(var(--primary-color), var(--secondary-color));
+        }
+        
+        .animation-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+        
+        .animation-background::before {
+            content: '';
+            position: absolute;
+            top: -200%;
+            left: -200%;
+            width: 400%;
+            height: 400%;
+            background: rgba(255, 255, 255, 0.1);
+            background-image: radial-gradient(circle, #fff 1px, transparent 1px);
+            background-size: 30px 30px;
+            animation: move-background 20s linear infinite;
+        }
+        
+        @keyframes move-background {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .text-container {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+        
+        .text-slide {
+            letter-spacing: 8px;
+            color: white;
+            font-size: 48px;
+            text-align: center;
+            opacity: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            transition: opacity 1s ease-in-out;
+        }
+        
+        .text-slide.visible {
+            opacity: 1;
+        }
+        
+        .text-slide span {
+            opacity: 0;
+            display: inline-block;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+        
+        .text-slide span.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .enter-button {
+            position: relative;
+            z-index: 1;
+            margin-top: 80px;
+            font-size: 24px;
+            color: white;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        
+        .enter-button.visible {
+            opacity: 1;
+        }
+        
+        .enter-button span {
+            border: 2px solid white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .enter-button span:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 24px;
+            background-color: white;
+            margin-left: 5px;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0;
+            }
+        }
+        
+        .main-content {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: #ffffff;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .card {
+            background-color: #2d2d2d;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        @media (max-width: 600px) {
+            .text-slide {
+                font-size: 24px;
+                letter-spacing: 4px;
+            }
+            
+            .enter-button {
+                font-size: 18px;
+                margin-top: 60px;
+            }
+            
+            .enter-button span {
+                padding: 10px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero-section">
+        <div class="animation-background"></div>
+        <div class="text-container">
+            <div class="text-slide">欢迎来到南北的博客</div>
+            <div class="text-slide">分享技术与生活</div>
+            <div class="text-slide">记录学习与成长</div>
+            <div class="text-slide">探索安全与编程</div>
+            <div class="text-slide">连接思想与创意</div>
+        </div>
+        <div class="enter-button" id="enterButton">
+            <span id="enterText">点击进入</span>
+            <span class="cursor"></span>
+        </div>
+    </div>
+    
+    <div class="main-content">
+        <h1>博客首页</h1>
+        
+        <div class="card">
+            <h2>测试文章 1</h2>
+            <p>这是一篇测试文章，用于展示博客的基本结构和样式。</p>
+        </div>
+        
+        <div class="card">
+            <h2>测试文章 2</h2>
+            <p>这是另一篇测试文章，用于展示博客的基本结构和样式。</p>
+        </div>
+    </div>
+    
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+    const texts = document.querySelectorAll('.text-slide');
+    const enterButton = document.getElementById('enterButton');
+    const enterText = document.getElementById('enterText');
+    let currentIndex = 0;
+
+    texts.forEach((text) => {
+        const characters = text.textContent.split('').map(char => `<span>${char}</span>`).join('');
+        text.innerHTML = characters;
+    });
+
+    function showNextText() {
+        const currentText = texts[currentIndex];
+        currentText.style.opacity = '1';
+        currentText.style.display = 'block';
+
+        const spans = currentText.querySelectorAll('span');
+        let spanIndex = 0;
+
+        function showNextSpan() {
+            if (spanIndex < spans.length) {
+                spans[spanIndex].classList.add('visible');
+                spanIndex++;
+                setTimeout(showNextSpan, 100);
+            } else {
+                setTimeout(() => {
+                    currentText.style.opacity = '0';
+                    currentText.style.display = 'none';
+                    spans.forEach(span => span.classList.remove('visible'));
+                    currentIndex++;
+                    
+                    if (currentIndex < texts.length) {
+                        showNextText();
+                    } else {
+                        enterButton.classList.add('visible');
+                        typeEnterText();
+                    }
+                }, 2000);
+            }
+        }
+
+        showNextSpan();
+    }
+
+    function typeEnterText() {
+        const text = "点击进入";
+        enterText.textContent = "";
+        
+        let index = 0;
+        function type() {
+            if (index < text.length) {
+                enterText.textContent += text.charAt(index);
+                index++;
+                setTimeout(type, 200);
+            }
+        }
+        
+        type();
+    }
+
+    enterButton.addEventListener('click', () => {
+        // 滚动到博客内容区域
+        window.scrollTo({
+            top: document.querySelector('.main-content').offsetTop,
+            behavior: 'smooth'
+        });
+    });
+
+    showNextText();
+});
+</script>
+</body>
+</html>

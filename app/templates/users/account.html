@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+    <h1 class="mb-4">账户信息</h1>
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">个人信息</h2>
+            <p class="card-text">用户名: {{ current_user.username }}</p>
+            <p class="card-text">邮箱: {{ current_user.email }}</p>
+            <p class="card-text">注册时间: {{ current_user.date_joined }}</p>
+            <h2 class="card-title mt-4">我的文章</h2>
+            {% if current_user.posts %}
+                <ul class="list-group">
+                    {% for post in current_user.posts %}
+                        <li class="list-group-item">
+                            <a href="{{ url_for('blog.post', post_id=post.id) }}">{{ post.title }}</a>
+                            <span class="float-end">发布于: {{ post.date_posted.strftime('%Y-%m-%d %H:%M') }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="card-text">您还没有发布过文章</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

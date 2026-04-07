@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>南北的博客 - 欢迎</title>
+    <style>
+        :root {
+            --primary-color: #aaa3ff;
+            --secondary-color: #7a72bb;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+        
+        .entry-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            z-index: 9999;
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8));
+        }
+        
+        .header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        
+        .blog-title {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .animation-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .animation-background img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            animation: fade-in 2s ease-in-out forwards;
+        }
+        
+        .animation-background::before {
+            content: '';
+            position: absolute;
+            top: -200%;
+            left: -200%;
+            width: 400%;
+            height: 400%;
+            background: rgba(255, 255, 255, 0.1);
+            background-image: radial-gradient(circle, #fff 1px, transparent 1px);
+            background-size: 30px 30px;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        
+        .animation-background.active::before {
+            opacity: 1;
+            animation: move-background 20s linear infinite;
+        }
+        
+        @keyframes fade-in {
+            from {
+                opacity: 0;
+                transform: scale(1.2);
+            }
+            to {
+                opacity: 0.8;
+                transform: scale(1);
+            }
+        }
+        
+        @keyframes move-background {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .text-container {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            width: 100%;
+            height: 100px;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(90deg, #ff8b8b, #80d8c8, #80b7d1, #b6d9a4, #ffeca7);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient 3s ease infinite;
+        }
+        
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        
+        .text-slide {
+            letter-spacing: 8px;
+            font-size: 48px;
+            text-align: center;
+            opacity: 0;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            white-space: nowrap;
+            transition: opacity 1s ease-in-out;
+        }
+        
+        .text-slide.visible {
+            opacity: 1;
+        }
+        
+        .text-slide span {
+            opacity: 0;
+            display: inline-block;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+        
+        .text-slide span.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .enter-button {
+            position: relative;
+            z-index: 1;
+            margin-top: 40px;
+            font-size: 36px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            text-align: center;
+        }
+        
+        .enter-button.visible {
+            opacity: 1;
+        }
+        
+        .enter-button a {
+            display: inline-block;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .enter-button a:hover {
+            transform: scale(1.05);
+        }
+        
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 24px;
+            background-color: white;
+            margin-left: 5px;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .text-slide {
+                font-size: 24px;
+                letter-spacing: 4px;
+            }
+            
+            .enter-button {
+                font-size: 18px;
+                margin-top: 60px;
+            }
+            
+            .enter-button a {
+                padding: 10px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="entry-animation" id="entryAnimation">
+        <div class="header">
+            <h1 class="blog-title">南北的博客</h1>
+        </div>
+        <div class="animation-background">
+            <img src="{{ url_for('static', filename='images/【哲风壁纸】动漫动物-动漫男孩.png') }}" alt="原神壁纸">
+        </div>
+        <div class="text-container">
+            <div class="text-slide">旅行者</div>
+            <div class="text-slide">当你重新踏上旅途</div>
+            <div class="text-slide">别忘了旅途本身的意义</div>
+            <div class="text-slide">提瓦特有风与歌</div>
+            <div class="text-slide">有烟火与远方</div>
+            <div class="text-slide">而这里，是我与你的小小世界</div>
+            <div class="text-slide">愿每一次落笔</div>
+            <div class="text-slide">都像风路过原野</div>
+            <div class="text-slide">自在、温柔、有回响</div>
+        </div>
+        <div class="enter-button" id="enterButton">
+            <a href="{{ url_for('main.home') }}" id="enterLink">欢迎来到提瓦特</a>
+            <span class="cursor"></span>
+        </div>
+    </div>
+    
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+    const texts = document.querySelectorAll('.text-slide');
+    const enterButton = document.getElementById('enterButton');
+    const enterLink = document.getElementById('enterLink');
+    const backgroundImage = document.querySelector('.animation-background img');
+    let currentIndex = 0;
+
+    texts.forEach((text) => {
+        const characters = text.textContent.split('').map(char => `<span class="gradient-text">${char}</span>`).join('');
+        text.innerHTML = characters;
+    });
+
+    function showNextText() {
+        const currentText = texts[currentIndex];
+        currentText.style.opacity = '1';
+        currentText.style.display = 'block';
+
+        const spans = currentText.querySelectorAll('span');
+        let spanIndex = 0;
+
+        function showNextSpan() {
+            if (spanIndex < spans.length) {
+                spans[spanIndex].classList.add('visible');
+                spanIndex++;
+                setTimeout(showNextSpan, 100);
+            } else {
+                window.textAnimationTimeout = setTimeout(() => {
+                    currentText.style.opacity = '0';
+                    currentText.style.display = 'none';
+                    spans.forEach(span => span.classList.remove('visible'));
+                    currentIndex++;
+                    
+                    if (currentIndex < texts.length) {
+                        showNextText();
+                    } else {
+                        enterButton.classList.add('visible');
+                        typeEnterText();
+                    }
+                }, 2000);
+            }
+        }
+
+        showNextSpan();
+    }
+
+    function typeEnterText() {
+        const text = "[欢迎来到提瓦特]";
+        enterLink.innerHTML = "";
+        
+        let index = 0;
+        function type() {
+            if (index < text.length) {
+                const charSpan = document.createElement('span');
+                if (text.charAt(index) === '[' || text.charAt(index) === ']') {
+                    charSpan.style.color = 'white';
+                    charSpan.style.fontSize = '36px';
+                } else {
+                    charSpan.className = 'gradient-text';
+                }
+                charSpan.textContent = text.charAt(index);
+                enterLink.appendChild(charSpan);
+                index++;
+                setTimeout(type, 200);
+            }
+        }
+        
+        type();
+    }
+
+    // 开始动画
+    function startAnimations() {
+        // 激活背景的动态效果（转圈圈的白色点点）
+        const animationBackground = document.querySelector('.animation-background');
+        animationBackground.classList.add('active');
+        
+        // 同时开始文本动画
+        showNextText();
+    }
+
+    // 添加点击反馈效果
+    function createClickFeedback(e) {
+        const feedback = document.createElement('div');
+        feedback.style.position = 'fixed';
+        feedback.style.left = e.clientX + 'px';
+        feedback.style.top = e.clientY + 'px';
+        feedback.style.width = '0';
+        feedback.style.height = '0';
+        feedback.style.borderRadius = '50%';
+        feedback.style.background = 'rgba(255, 255, 255, 0.5)';
+        feedback.style.transform = 'translate(-50%, -50%)';
+        feedback.style.zIndex = '10000';
+        feedback.style.pointerEvents = 'none';
+        document.body.appendChild(feedback);
+        
+        // 动画效果
+        let size = 0;
+        const maxSize = 300;
+        const duration = 500;
+        const startTime = Date.now();
+        
+        function animate() {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            size = maxSize * progress;
+            feedback.style.width = size + 'px';
+            feedback.style.height = size + 'px';
+            feedback.style.opacity = 1 - progress;
+            
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            } else {
+                document.body.removeChild(feedback);
+            }
+        }
+        
+        animate();
+    }
+
+    // 点击页面任意位置直接显示"欢迎来到提瓦特"按钮
+    document.addEventListener('click', function(e) {
+        // 创建点击反馈效果
+        createClickFeedback(e);
+        
+        // 停止所有正在进行的动画
+        clearTimeout(window.textAnimationTimeout);
+        clearTimeout(window.backgroundAnimationTimeout);
+        
+        // 隐藏所有文本
+        texts.forEach(text => {
+            text.style.opacity = '0';
+            text.style.display = 'none';
+        });
+        
+        // 激活背景的动态效果（转圈圈的白色点点）
+        const animationBackground = document.querySelector('.animation-background');
+        animationBackground.classList.add('active');
+        
+        // 延迟一点时间再显示"欢迎来到提瓦特"按钮，让反馈效果先显示
+        setTimeout(() => {
+            enterButton.classList.add('visible');
+            typeEnterText();
+        }, 300);
+    });
+
+    if (backgroundImage.complete) {
+        // 图片已经加载完成，立即开始动画
+        startAnimations();
+    } else {
+        // 图片还未加载完成，等加载完成后立即开始动画
+        backgroundImage.onload = function() {
+            startAnimations();
+        };
+    }
+});
+</script>
+</body>
+</html>

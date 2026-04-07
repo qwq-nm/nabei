@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+{% block title %}创建文章{% endblock %}
+{% block head %}
+    <!-- 引入 EasyMDE Markdown 编辑器 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.js"></script>
+    <style>
+        .video-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        .video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.6);
+        }
+        .main-container {
+            position: relative;
+            z-index: 1;
+        }
+        /* 改进表单样式，增加对比度 */
+        .create-post-form {
+            background-color: rgba(255, 255, 255, 0.4) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-left: 4px solid #4169e1 !important;
+            position: relative;
+            overflow: hidden;
+        }
+        .create-post-form::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 0;
+            height: 0;
+            border-top: 80px solid rgba(65, 105, 225, 0.1);
+            border-left: 80px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .create-post-form:hover::after {
+            width: 100%;
+            height: 100%;
+            border-top: none;
+            border-left: none;
+            background: linear-gradient(135deg, rgba(65, 105, 225, 0.1) 0%, rgba(65, 105, 225, 0) 100%);
+        }
+        .create-post-form .form-control {
+            background-color: rgba(255, 255, 255, 0.8) !important;
+            border: 1px solid #ddd !important;
+            color: #333 !important;
+            font-size: 1rem;
+        }
+        .create-post-form .form-control:focus {
+            background-color: rgba(255, 255, 255, 0.9) !important;
+            border-color: #4169e1 !important;
+            color: #333 !important;
+            box-shadow: 0 0 0 0.2rem rgba(65, 105, 225, 0.25);
+        }
+        .create-post-form .form-label {
+            color: #444 !important;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .card-title {
+            color: #4169e1 !important;
+            background: linear-gradient(90deg, #4169e1, #1e40af) !important;
+            -webkit-background-clip: text !important;
+            background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+        }
+        .create-post-form select.form-control {
+            background-color: rgba(255, 255, 255, 0.8) !important;
+            color: #333 !important;
+        }
+        .create-post-form select.form-control option {
+            background-color: #ffffff !important;
+            color: #333 !important;
+        }
+        /* EasyMDE 编辑器样式调整 */
+        .EasyMDEContainer .CodeMirror {
+            background-color: rgba(255, 255, 255, 0.9) !important;
+            color: #333 !important;
+            border: 1px solid #ddd !important;
+        }
+        .EasyMDEContainer .CodeMirror-cursor {
+            border-color: #333 !important;
+        }
+        .EasyMDEContainer .editor-toolbar {
+            background-color: rgba(240, 240, 240, 0.9) !important;
+            border: 1px solid #ddd !important;
+        }
+        .EasyMDEContainer .editor-toolbar button {
+            color: #333 !important;
+        }
+        .EasyMDEContainer .editor-toolbar button:hover {
+            background-color: #ddd !important;
+        }
+        .EasyMDEContainer .editor-preview {
+            background-color: rgba(255, 255, 255, 0.9) !important;
+            color: #333 !important;
+        }
+        .EasyMDEContainer .editor-statusbar {
+            background-color: rgba(240, 240, 240, 0.9) !important;
+            color: #333 !important;
+            border: 1px solid #ddd !important;
+        }
+        .card-title {
+            color: #333 !important;
+        }
+        #content-error {
+            color: #ff6b6b !important;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="video-container">
+        <video autoplay muted loop>
+            <source src="{{ url_for('static', filename='images/【哲风壁纸】光影-光斑-光束.mp4') }}" type="video/mp4">
+            您的浏览器不支持视频播放
+        </video>
+    </div>
+    <div class="card create-post-form">
+        <div class="card-body">
+            <h1 class="card-title">创建新文章</h1>
+            <form method="POST" action="{{ url_for('admin.create_post') }}">
+                <div class="form-group">
+                    <label for="title" class="form-label">标题</label>
+                    <input type="text" class="form-control" id="title" name="title" placeholder="请输入文章标题" required>
+                </div>
+                <div class="form-group mt-3">
+                    <label for="category" class="form-label">分类</label>
+                    <select class="form-control" id="category" name="category" required>
+                        <option value="">请选择分类</option>
+                        <option value="web">Web</option>
+                        <option value="pwn">Pwn</option>
+                        <option value="misc">Misc</option>
+                        <option value="crypto">Crypto</option>
+                        <option value="reverse">Reverse</option>
+                        <option value="算法">算法</option>
+                    </select>
+                </div>
+                <div class="form-group mt-3">
+                    <label for="date_posted" class="form-label">发布时间</label>
+                    <input type="datetime-local" class="form-control" id="date_posted" name="date_posted" required>
+                </div>
+                <div class="form-group mt-3">
+                    <label for="content" class="form-label">内容 (支持 Markdown) <span style="color: #ff6b6b;">*</span></label>
+                    <textarea class="form-control" id="content" name="content" rows="15"></textarea>
+                    <div id="content-error" style="display: none; margin-top: 5px;">请输入文章内容</div>
+                </div>
+                <div class="form-group mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg" id="submit-btn">
+                        <i class="fas fa-paper-plane mr-2"></i>发布文章
+                    </button>
+                    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary btn-lg ml-2">
+                        <i class="fas fa-times mr-2"></i>取消
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 初始化 EasyMDE 编辑器
+        const easyMDE = new EasyMDE({
+            element: document.getElementById('content'),
+            spellChecker: false,
+            autosave: {
+                enabled: true,
+                delay: 1000,
+                uniqueId: 'create-post-content'
+            },
+            toolbar: [
+                'bold', 'italic', 'heading', '|',
+                'code', 'quote', 'unordered-list', 'ordered-list', '|',
+                'link', 'image', 'table', '|',
+                'preview', 'side-by-side', 'fullscreen', '|',
+                'guide'
+            ],
+            placeholder: '在这里输入文章内容，支持 Markdown 格式...',
+            status: ['lines', 'words', 'cursor'],
+            lineWrapping: true
+        });
+
+        // 设置默认时间为当前时间
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        document.getElementById('date_posted').value = `${year}-${month}-${day}T${hours}:${minutes}`;
+
+        // 表单提交前同步编辑器内容到 textarea 并进行验证
+        document.querySelector('form').addEventListener('submit', function(e) {
+            // 将 EasyMDE 编辑器的内容同步到原始 textarea
+            easyMDE.codemirror.save();
+            
+            // 检查内容是否为空
+            const content = easyMDE.value().trim();
+            if (!content) {
+                e.preventDefault();
+                document.getElementById('content-error').style.display = 'block';
+                easyMDE.codemirror.focus();
+                return false;
+            } else {
+                document.getElementById('content-error').style.display = 'none';
+            }
+        });
+    </script>
+{% endblock %}
