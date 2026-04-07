@@ -12,7 +12,9 @@ from app import app, db
 # 添加静态文件路由
 @app.route('/static/<path:path>')
 def send_static(path):
-    return send_from_directory('public', path)
+    # 使用绝对路径确保能找到public目录
+    static_dir = os.path.join(os.path.dirname(__file__), '..', 'public')
+    return send_from_directory(static_dir, path)
 
 # 导入Markdown解析库
 import mistune
