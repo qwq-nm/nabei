@@ -12,7 +12,10 @@ load_dotenv()
 project_root = os.path.abspath(os.path.dirname(__file__))
 # 静态文件目录（位于项目根目录下）
 static_dir = os.path.join(project_root, '..', 'public')
-app = Flask(__name__, static_folder=static_dir, static_url_path='/static')
+# 为Vercel部署设置临时instance_path
+import tempfile
+temp_dir = tempfile.gettempdir()
+app = Flask(__name__, static_folder=static_dir, static_url_path='/static', instance_path=temp_dir)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'default_secret_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or 'sqlite:///blog.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
